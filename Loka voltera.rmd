@@ -1,0 +1,84 @@
+---
+title: "Lotka Voltera Plot"
+output: html_document
+date: "2024-11-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is my practice Sheet for mathematical simulation
+
+
+
+
+# Install and load the deSolve package
+```{r pressure, echo=FALSE}
+if (!requireNamespace("deSolve", quietly = TRUE)) {
+  install.packages("deSolve")
+}
+library(deSolve)
+install.packages("ggplot2")
+```
+
+# Define the Lotka-Volterra model
+```{r}
+lotka_volterra <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dx <- alpha * x - beta * x * y
+    dy <- delta * x * y - gamma * y
+    list(c(dx, dy))
+  })
+}
+
+```
+
+
+# Initial conditions
+```{r}
+state <- c(x = 40, y = 9)  # Initial populations of prey and predators
+```
+
+
+# Parameters
+```{r}
+parameters <- c(alpha = 0.1, beta = 0.02, delta = 0.01, gamma = 0.1)
+```
+
+
+# Time sequence for simulation
+```{r}
+times <- seq(0, 200, by = 1)
+```
+
+
+# Solve the ODE
+```{r}
+output <- ode(y = state, times = times, func = lotka_volterra, parms = parameters)
+```
+
+
+# Convert output to a data frame
+```{r}
+output <- as.data.frame(output)
+```
+
+
+# Plot the results
+```{r}
+library(ggplot2)
+ggplot(output, aes(x = time)) +
+  geom_line(aes(y = x, color = "Prey Population")) +
+  geom_line(aes(y = y, color = "Predator Population")) +
+  labs(
+    title = "Lotka-Volterra Predator-Prey Model",
+    x = "Time",
+    y = "Population"
+  ) +
+  scale_color_manual(name = "Legend", values = c("Prey Population" = "blue", "Predator Population" = "red")) +
+  theme_minimal()
+```
+
